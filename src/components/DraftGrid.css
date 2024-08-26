@@ -1,0 +1,98 @@
+/* Hide the draft grid by default */
+.draft-grid {
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 100000;
+  }
+  
+  /* Show the draft grid */
+  .draft-grid.visible {
+    display: block;
+    height: 500px;
+    overflow: auto;
+    width: 80%;
+    position: fixed;
+    top: 25%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+   /* Show the draft grid */
+   .draft-grid.hidden {
+    display: none;
+  }
+  
+  .draft-grid table {
+    width: 100%;
+    border: 1px solid #ddd;
+    table-layout: fixed;
+  }
+  
+  .draft-grid th, .draft-grid td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+    overflow: hidden;
+    /* white-space: nowrap; */
+    text-overflow: ellipsis;
+  }
+  
+  .draft-grid th {
+    background-color: #f4f4f4;
+  }
+  
+  .grid-cell {
+    cursor: pointer;
+    position: relative;
+    font-size: .75em;
+  }
+  
+  .grid-cell.selected {
+    background-color: #d4edda; /* Light green for selected square */
+  }
+  
+  .grid-cell.current-pick {
+    background-color: #cce5ff; /* Light blue for current pick square */
+  }
+  
+  .player-entry {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .player-entry span {
+    margin-right: 8px;
+  }
+  
+  .player-entry button {
+    background-color: #dc3545; /* Bootstrap danger color */
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .player-entry button:hover {
+    background-color: #c82333;
+  }
+
+/* Style for the button that opens the grid */
+.open-grid-button {
+    position: fixed;
+    top: 10%;
+    right: 50%;
+    background-color: #007bff; /* Bootstrap primary color */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 1001; /* Ensure it is on top of other content */
+  }
+  
+  .open-grid-button:hover {
+    background-color: #0056b3; /* Darker shade for hover effect */
+  }
+  
