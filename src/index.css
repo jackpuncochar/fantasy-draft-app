@@ -11,3 +11,34 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.draft-board-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.draft-board-table th,
+.draft-board-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.draft-board-table td {
+  position: relative;
+}
+
+.draft-board-card {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1;
+  background-color: white;
+  border: 1px solid #ddd;
+  padding: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.draft-header{
+  display: flex; flex-direction: row !important; gap: 2em; flex-wrap: wrap;
+}

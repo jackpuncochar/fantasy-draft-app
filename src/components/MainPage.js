@@ -12,7 +12,7 @@ const MainPage = () => {
     };
 
     return (
-        <div class="main-page-container">
+        <div className="main-page-container">
             <h1>Fantasy Football Draft App</h1>
             <h2>Choose Draft Type:</h2>
             <select value={draftSettings.draftType} 
@@ -26,8 +26,8 @@ const MainPage = () => {
             </select>
 
             {(draftSettings.draftType === 'snake' || draftSettings.draftType === 'auction') && (
-                <div class="input-container">
-                    <div class="input-item">
+                <div className="input-container">
+                    <div className="input-item">
                         <label>Number of teams:</label>
                         <input 
                             type="number" 
@@ -40,7 +40,7 @@ const MainPage = () => {
                             })} 
                         />
                     </div>
-                    <div class="input-item">
+                    <div className="input-item">
                         <label>Number of rounds:</label>
                         <input 
                             type="number" 
@@ -59,6 +59,7 @@ const MainPage = () => {
             <button onClick={handleStartDraft} disabled={!draftSettings.draftType}>
                 Start Draft
             </button>
+            <a href='/sleeper'><button>Sleeper Form</button></a>
         </div>
     );
 };
