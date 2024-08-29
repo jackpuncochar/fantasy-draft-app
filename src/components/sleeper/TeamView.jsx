@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import useStore from '../../store/Store';
+import '../../index.css';
 
 const TeamView = () => {
   const { leagueUsers, draftPicks, draftData, getDraftPickStats } = useStore();
@@ -45,7 +46,7 @@ const TeamView = () => {
     let totalAdpDiff = 0;
     let totalRankDiff = 0;
 
-    const rosterElements = rosterSlots.map((slot, index) => {
+    const rosterRows = rosterSlots.map((slot, index) => {
       const pick = userPicks.find(p => isValidForSlot(p, slot));
 
       let stats = { adpDiff: 0, rankDiff: 0 };
@@ -57,28 +58,41 @@ const TeamView = () => {
       }
 
       return (
-        <div key={index} className="roster-slot">
-          <span className="slot-name">{slot}:</span>
-          {pick ? (
-            <span className="player-name">
-              {pick.metadata.first_name} {pick.metadata.last_name} ({pick.metadata.position} - {pick.metadata.team || 'FA'})
-              {' (ADP Diff: '}{stats.adpDiff.toFixed(2)}{', Rank Diff: '}{stats.rankDiff}{')'}
-            </span>
-          ) : (
-            <span className="empty-slot">Empty</span>
-          )}
-        </div>
+        <tr key={index}>
+          <td className="slot-name">{slot}</td>
+          <td className="player-name-full">
+            {pick ? (
+              <>
+                {pick.metadata.first_name} {pick.metadata.last_name} ({pick.metadata.team || 'FA'})
+              </>
+            ) : ''}
+          </td>
+          <td>{pick ? stats.adpDiff : ''}</td>
+          <td>{pick ? stats.rankDiff : ''}</td>
+        </tr>
       );
     });
 
     return (
       <>
-        {rosterElements}
-        <div className="team-stats">
-          <h4>Team Statistics</h4>
-          <p>Total ADP Difference: {totalAdpDiff.toFixed(1)}</p>
-          <p>Total Rank Difference: {totalRankDiff}</p>
-        </div>
+        <table className="roster-table">
+          <thead>
+            <tr>
+              <th>Position</th>
+              <th>Player</th>
+              <th>ADP Diff</th>
+              <th>Rank Diff</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rosterRows}
+            <tr className="totals-row">
+            <td colSpan="2" className="totals-label">Value Totals</td>
+            <td>{totalAdpDiff}</td>
+            <td>{totalRankDiff}</td>
+        </tr>
+          </tbody>
+        </table>
       </>
     );
   };
@@ -86,7 +100,7 @@ const TeamView = () => {
   return (
     <div className="team-view">
       <div className="user-list">
-        <h3>Select a Team:</h3>
+        {/* <h3>Select a Team:</h3> */}
         {leagueUsers && leagueUsers.map(user => (
           <button
             key={user.user_id}
@@ -99,7 +113,7 @@ const TeamView = () => {
       </div>
       {selectedUserId && (
         <div className="user-roster">
-          <h3>{leagueUsers.find(u => u.user_id === selectedUserId)?.display_name}'s Roster</h3>
+          {/* <h3>{leagueUsers.find(u => u.user_id === selectedUserId)?.display_name}'s Roster</h3> */}
           {renderRoster()}
         </div>
       )}

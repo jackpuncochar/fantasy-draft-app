@@ -1,22 +1,29 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import useStore from '../../store/Store';
 
 const SleeperList = () => {
-    const { playerRanks, draftPicks } = useStore();
+    const { playerRanks, draftPicks, selectedLeague } = useStore();
     const [sortColumn, setSortColumn] = useState('Rank');
     const [sortDirection, setSortDirection] = useState('asc');
     const [positionFilter, setPositionFilter] = useState('All');
+    const [availablePlayers, setAvailablePlayers] = useState([]);
 
-    const availablePlayers = useMemo(() => {
-        if (!draftPicks || !playerRanks["Fantasy Pros 2 QB Rankings"]) return [];
+    // Fetch available players when the league is selected or when draft picks are updated
+    useEffect(() => {
+        if (selectedLeague && playerRanks && playerRanks["Fantasy Pros 2 QB Rankings"]) {
+            const pickedPlayerNames = draftPicks && draftPicks.length > 0
+                ? new Set(draftPicks.map(pick =>
+                    `${pick.metadata.first_name} ${pick.metadata.last_name}`
+                ))
+                : new Set();
 
-        const pickedPlayerNames = new Set(draftPicks.map(pick => 
-            `${pick.metadata.first_name} ${pick.metadata.last_name}`
-        ));
-        return playerRanks["Fantasy Pros 2 QB Rankings"].filter(player => 
-            !pickedPlayerNames.has(player.Player)
-        );
-    }, [playerRanks, draftPicks]);
+            const filteredPlayers = playerRanks["Fantasy Pros 2 QB Rankings"].filter(player =>
+                !pickedPlayerNames.has(player.Player)
+            );
+
+            setAvailablePlayers(filteredPlayers);
+        }
+    }, [selectedLeague, playerRanks, draftPicks]);
 
     const currentPickNumber = draftPicks ? draftPicks.length + 1 : 1;
 
@@ -77,8 +84,8 @@ const SleeperList = () => {
 
     return (
         <div>
-            <h2>Available Players</h2>
             <p>Current Pick: {currentPickNumber}</p>
+            <h2 style={{ 'margin-bottom':'.5em' }}>Available Players</h2>
             <div>
                 <label>
                     Filter by Position:
@@ -89,10 +96,10 @@ const SleeperList = () => {
                     </select>
                 </label>
             </div>
-            <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+            <table style={{ borderCollapse: 'collapse', width: '60%' }}>
                 <thead>
                     <tr>
-                        {['Player', 'Team', 'Pos', 'Rank', 'Tier', 'Pos Rank', 'Bye', 'ADP', 'Rank Diff', 'ADP Diff', 'Avg Pick', 'High', 'Low', 'Std Dev'].map(header => (
+                        {['Player', 'Team', 'Pos', 'Rank', 'Pos Rank', 'Tier', 'Bye', 'ADP', 'Rank Diff', 'ADP Diff'].map(header => (
                             <th key={header} onClick={() => handleSort(header)} style={{cursor: 'pointer'}}>
                                 {header} {sortColumn === header && (sortDirection === 'asc' ? '↑' : '↓')}
                             </th>
@@ -109,16 +116,12 @@ const SleeperList = () => {
                                 <td>{player.Team}</td>
                                 <td>{player.Position}</td>
                                 <td>{player.Rank}</td>
-                                <td>{player.Tier}</td>
                                 <td>{player['Pos Rank']}</td>
+                                <td>{player.Tier}</td>
                                 <td>{player.Bye}</td>
                                 <td>{player.ADP}</td>
                                 <td style={getDifferenceStyle(rankDiff)}>{formatDifference(rankDiff)}</td>
                                 <td style={getDifferenceStyle(adpDiff)}>{formatDifference(adpDiff)}</td>
-                                <td>{player['Avg Pick']}</td>
-                                <td>{player.High}</td>
-                                <td>{player.Low}</td>
-                                <td>{player['Std Dev']}</td>
                             </tr>
                         );
                     })}

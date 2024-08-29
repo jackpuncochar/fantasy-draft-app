@@ -14,7 +14,7 @@ const MainPage = () => {
     return (
         <div className="main-page-container">
             <h1>Fantasy Football Draft App</h1>
-            <h2>Choose Draft Type:</h2>
+            <h4 style={{ 'margin-bottom':'5px' }}>Choose Draft Type:</h4>
             <select value={draftSettings.draftType} 
                     onChange={(e) => setDraftSettings({
                         ...draftSettings,
@@ -56,10 +56,15 @@ const MainPage = () => {
                 </div>
                 
             )}
-            <button onClick={handleStartDraft} disabled={!draftSettings.draftType}>
+            <button className='start-draft-button' onClick={handleStartDraft} disabled={!draftSettings.draftType}>
                 Start Draft
             </button>
-            <a href='/sleeper'><button>Sleeper Form</button></a>
+            <span>or...</span>
+            <a href='/sleeper'>
+                <button className='sleeper-button'>
+                    Connect to Sleeper
+                </button>
+            </a>
         </div>
     );
 };

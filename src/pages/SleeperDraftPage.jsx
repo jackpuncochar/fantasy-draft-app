@@ -4,9 +4,9 @@ import DraftBoard from "../components/sleeper/DraftBoard"
 const SleeperDraftPage =()=>{
 
     return(<>
-<a href="/"><button>Home</button></a>
+<a href="/"><button className='sleeper-home-button'>Home</button></a>
     <DraftBoard/>
     </>)
 }
 
-export default SleeperDraftPage
+export default SleeperDraftPage;
