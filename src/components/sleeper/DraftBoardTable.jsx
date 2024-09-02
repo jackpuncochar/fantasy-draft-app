@@ -16,7 +16,7 @@ const DraftBoardTable = ({ toggleView }) => {
   const [selectedPlayerId, setSelectedPlayerId] = useState(null);
 
   if (!draftData || !draftPicks || !leagueUsers) {
-    return <div>Start Live Updates to see the draft board.</div>;
+    return <div style={{ display:'flex', marginTop:'6px', justifyContent:'center' }}>^Start Live Updates to see the draft board.</div>;
   }
 
   const numRounds = draftData.settings.rounds;
@@ -31,63 +31,66 @@ const DraftBoardTable = ({ toggleView }) => {
   };
 
   return (
-    // <div className="page-container">
-        <div className="draft-board-container">
-          <button 
-            className="close-draft-board-button" 
-            onClick={() => toggleView('board')}
-          >
-            X
-          </button>
-          <table className="draft-board-table">
-            <thead>
-              <tr>
-                <th>Round</th>
-                {sortedUserIds.map(userId => (
-                  <th key={userId}>{leagueUsers.find(u => u.user_id === userId)?.display_name || 'Unknown'}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {Array.from({ length: numRounds }, (_, roundIndex) => (
-                <tr key={roundIndex}>
-                  <td>{roundIndex + 1}</td>
-                  {sortedUserIds.map(userId => {
-                    const draftPick = getPickForUserInRound(userId, roundIndex + 1);
-                    const backgroundColor = draftPick ? positionColors[draftPick.metadata.position] || '#fafafa' : '#fafafa';
-                    return (
-                      <td 
-                        key={userId}
-                        className="draft-cell"
-                        style={{ backgroundColor }}
-                        onClick={() => setSelectedPlayerId(draftPick?.player_id)}
-                      >
-                        {draftPick ? (
-                          <>
-                            <span className="pick-number">{draftPick.pick_no}</span>
-                            <div className="player-info">
-                              <div className="player-name">
-                                {draftPick.metadata.first_name.charAt(0)}. {draftPick.metadata.last_name}
-                              </div>
-                              <div className="player-team-position">
-                                {draftPick.metadata.position} - {draftPick.metadata.team || 'FA'}
-                              </div>
-                            </div>
-                            {selectedPlayerId === draftPick.player_id && (
-                              <DraftBoardCard playerId={draftPick.player_id} />
-                            )}
-                          </>
-                        ) : null}
-                      </td>
-                    );
-                  })}
-                </tr>
+    <div className='draft-board-wrapper'>
+      <div className='close-button-container'>
+        <button className="close-draft-board-button" onClick={() => toggleView('board')}>
+          X
+        </button>
+      </div>
+      <div className="draft-board-container">
+        <table className="draft-board-table">
+          <thead>
+            <tr>
+              <th>Round</th>
+              {sortedUserIds.map(userId => (
+                <th key={userId}>
+                  {leagueUsers.find(u => u.user_id === userId)?.display_name || 'Unknown'}
+                </th>
               ))}
-            </tbody>
-          </table>
-        </div>
-    // </div>
-  );
+            </tr>
+          </thead>
+          <tbody>
+            {Array.from({ length: numRounds }, (_, roundIndex) => (
+              <tr key={roundIndex}>
+                <td>{roundIndex + 1}</td>
+                {sortedUserIds.map(userId => {
+                  const draftPick = getPickForUserInRound(userId, roundIndex + 1);
+                  const backgroundColor = draftPick
+                    ? positionColors[draftPick.metadata.position] || '#fafafa'
+                    : '#fafafa';
+                  return (
+                    <td
+                      key={userId}
+                      className="draft-cell"
+                      style={{ backgroundColor }}
+                      onClick={() => setSelectedPlayerId(draftPick?.player_id)}
+                    >
+                      {draftPick ? (
+                        <>
+                          <span className="pick-number">{draftPick.pick_no}</span>
+                          <div className="player-info">
+                            <div className="player-name">
+                              {draftPick.metadata.first_name.charAt(0)}. {draftPick.metadata.last_name}
+                            </div>
+                            <div className="player-team-position">
+                              {draftPick.metadata.position} - {draftPick.metadata.team || 'FA'}
+                            </div>
+                          </div>
+                          {selectedPlayerId === draftPick.player_id && (
+                            <DraftBoardCard playerId={draftPick.player_id} />
+                          )}
+                        </>
+                      ) : null}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );  
 };
 
 export default DraftBoardTable;

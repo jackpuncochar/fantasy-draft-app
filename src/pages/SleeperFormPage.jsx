@@ -5,7 +5,7 @@ const SleeperFormPage =()=>{
 
     return(<>
     <div className="main-page-container">
-        <h2 style={ {'margin-bottom':'1rem'} }>Connect to your Sleeper league.</h2>
+        <h2 style={ {marginBottom:'1rem'} }>Connect to your Sleeper league.</h2>
         <SleeperForm/>
     </div>
     

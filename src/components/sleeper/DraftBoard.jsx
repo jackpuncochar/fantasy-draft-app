@@ -20,7 +20,7 @@ const DraftBoard = () => {
         
           picks.forEach((pick, index) => {
             const playerName = `${pick.metadata.first_name} ${pick.metadata.last_name}`;
-            const playerRank = playerRanks["Fantasy Pros 2 QB Rankings"].find(p => p.Player === playerName);
+            const playerRank = playerRanks.find(p => p.Player === playerName);
             if (playerRank) {
               const pickNumber = index + 1;
               const adpDiff = pickNumber - parseFloat(playerRank.ADP);
@@ -29,7 +29,7 @@ const DraftBoard = () => {
             }
           });
         } catch (error) {
-          console.error('Error fetching draft picks:', error);
+          // console.error('Error fetching draft picks:', error);
         }
       }, 1000);
     }
@@ -38,7 +38,7 @@ const DraftBoard = () => {
 
   if (!draftData) {
     return (
-      <div style={{ 'margin':'16px' }}>
+      <div style={{ margin:'16px' }}>
         <p>Why did you do that? The draft data is not available, or some shit.</p>
         <a href="/">Return to home page.</a>
       </div>
@@ -64,7 +64,7 @@ const DraftBoard = () => {
         <p>Status: {draftData.status}</p>
       </header>
 
-      <div className="button-container" style={{ 'display':'flex', 'justify-content':'center' }}>
+      <div className="button-container" style={{ 'display':'flex', justifyContent:'center' }}>
         <button 
           onClick={toggleLiveUpdates}
           className={`live-updates-button ${isLiveUpdating ? 'stop-updates' : 'start-updates'}`}
@@ -82,11 +82,18 @@ const DraftBoard = () => {
         <button 
           onClick={() => toggleView('teams')}
           className={`toggle-team-view-button ${activeView === 'teams' ? 'active' : ''}`}
+          disabled={!isLiveUpdating}
         >
           {activeView === 'teams' ? 'Hide Team View' : 'Show Team View'}
         </button>
+        {/* disable team view */}
+        {!isLiveUpdating && (
+        <div className="disabled-message">
+            Live updates are off, Team View is disabled.
+        </div>
+        )}
       </div>
-      <div style={{ 'display':'flex', 'justify-content':'center' }}>
+      
         {activeView === 'board' && (
           <DraftBoardTable 
             toggleView={toggleView}
@@ -94,7 +101,6 @@ const DraftBoard = () => {
           />
         )}
         {activeView === 'teams' && <TeamView />}
-      </div>
       <SleeperList />
     </div>
   );

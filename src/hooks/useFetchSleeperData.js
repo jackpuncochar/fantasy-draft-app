@@ -31,8 +31,8 @@ export const fetchLeagueData = async (leagueId, draftId) => {
       axios.get(`https://api.sleeper.app/v1/draft/${draftId}`)
     ]);
 
-    console.log(usersResponse)
-    console.log(draftResponse)
+    // console.log(usersResponse)
+    // console.log(draftResponse)
     return {
       users: usersResponse.data,
       draft: draftResponse.data
@@ -46,10 +46,10 @@ export const fetchLeagueData = async (leagueId, draftId) => {
 export const fetchDraftPicks = async (draftId) => {
   try {
     const response = await axios.get(`https://api.sleeper.app/v1/draft/${draftId}/picks`);
-    console.log('run')
+    console.log('run');
     return response.data;
   } catch (error) {
-    console.error('Error fetching draft picks:', error);
+    // console.error('Error fetching draft picks:', error);
     throw error;
   }
 };

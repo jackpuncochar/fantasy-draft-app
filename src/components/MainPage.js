@@ -14,7 +14,7 @@ const MainPage = () => {
     return (
         <div className="main-page-container">
             <h1>Fantasy Football Draft App</h1>
-            <h4 style={{ 'margin-bottom':'5px' }}>Choose Draft Type:</h4>
+            <h4 style={{ marginBottom:'5px' }}>Choose Draft Type:</h4>
             <select value={draftSettings.draftType} 
                     onChange={(e) => setDraftSettings({
                         ...draftSettings,

@@ -1,10 +1,26 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import useStore from '../../store/Store';
 import '../../index.css';
 
 const TeamView = () => {
-  const { leagueUsers, draftPicks, draftData, getDraftPickStats } = useStore();
+  const { 
+    leagueUsers, 
+    draftPicks, 
+    draftData, 
+    getDraftPickStats, 
+    mainUser,
+    getPlayerAdp,
+    getPlayerRank } = useStore();
+  
+  // State to track the selected user's ID
   const [selectedUserId, setSelectedUserId] = useState(null);
+
+  // Set main user as the selected user on component mount
+  useEffect(() => {
+    if (mainUser) {
+      setSelectedUserId(mainUser.user_id);
+    }
+  }, [mainUser]);
 
   const rosterSlots = useMemo(() => {
     if (!draftData) return null;
@@ -23,6 +39,15 @@ const TeamView = () => {
     if (!selectedUserId || !draftPicks) return [];
     return draftPicks.filter(pick => pick.picked_by === selectedUserId);
   }, [selectedUserId, draftPicks]);
+
+  // Create a map of pick IDs to overall pick numbers
+  const pickNumberMap = useMemo(() => {
+    const map = {};
+    draftPicks.forEach((pick, index) => {
+      map[pick.player_id] = index + 1;
+    });
+    return map;
+  }, [draftPicks]);
 
   const renderRoster = () => {
     if (!rosterSlots || userPicks.length === 0) return null;
@@ -48,13 +73,18 @@ const TeamView = () => {
 
     const rosterRows = rosterSlots.map((slot, index) => {
       const pick = userPicks.find(p => isValidForSlot(p, slot));
+      const overallPickNumber = pick ? pickNumberMap[pick.player_id] || '' : '';
 
+      const adp = pick ? getPlayerAdp(`${pick.metadata.first_name} ${pick.metadata.last_name}`) : '';
+      const rank = pick ? getPlayerRank(`${pick.metadata.first_name} ${pick.metadata.last_name}`) : '';
       let stats = { adpDiff: 0, rankDiff: 0 };
+
       if (pick) {
         filledSlots.add(pick.player_id);
         stats = getDraftPickStats(pick.player_id);
-        totalAdpDiff += stats.adpDiff;
+        totalAdpDiff += isNaN(stats.adpDiff) ? 0 : stats.adpDiff;
         totalRankDiff += stats.rankDiff;
+        console.log(`Pick ID: ${pick.player_id} - ADP Diff: ${stats.adpDiff}, Rank Diff: ${stats.rankDiff}`);
       }
 
       return (
@@ -67,7 +97,10 @@ const TeamView = () => {
               </>
             ) : ''}
           </td>
-          <td>{pick ? stats.adpDiff : ''}</td>
+          <td>{overallPickNumber}</td>
+          <td>{adp ? (isNaN(adp) ? '300' : adp) : ''}</td>
+          <td>{rank}</td>
+          <td>{pick ? (isNaN(stats.adpDiff) ? '10000' : stats.adpDiff) : ''}</td>
           <td>{pick ? stats.rankDiff : ''}</td>
         </tr>
       );
@@ -80,6 +113,9 @@ const TeamView = () => {
             <tr>
               <th>Position</th>
               <th>Player</th>
+              <th>Pick</th>
+              <th>ADP</th>
+              <th>Rank</th>
               <th>ADP Diff</th>
               <th>Rank Diff</th>
             </tr>
@@ -87,7 +123,7 @@ const TeamView = () => {
           <tbody>
             {rosterRows}
             <tr className="totals-row">
-            <td colSpan="2" className="totals-label">Value Totals</td>
+            <td colSpan="5" className="totals-label">Value Totals</td>
             <td>{totalAdpDiff}</td>
             <td>{totalRankDiff}</td>
         </tr>
@@ -100,11 +136,12 @@ const TeamView = () => {
   return (
     <div className="team-view">
       <div className="user-list">
-        {/* <h3>Select a Team:</h3> */}
         {leagueUsers && leagueUsers.map(user => (
           <button
             key={user.user_id}
-            onClick={() => setSelectedUserId(user.user_id)}
+            onClick={() => {
+              setSelectedUserId(user.user_id);
+            }}
             className={selectedUserId === user.user_id ? 'selected' : ''}
           >
             {user.display_name}
@@ -113,7 +150,6 @@ const TeamView = () => {
       </div>
       {selectedUserId && (
         <div className="user-roster">
-          {/* <h3>{leagueUsers.find(u => u.user_id === selectedUserId)?.display_name}'s Roster</h3> */}
           {renderRoster()}
         </div>
       )}

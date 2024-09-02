@@ -14,23 +14,30 @@ code {
     monospace;
 }
 
-.draft-board-container {
-  position: fixed;
-  width: 85%;
+.draft-board-wrapper {
+  position: absolute;
   top: 20%;
-  left: 10%;
-  background-color: white;
-  z-index: 10;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  overflow: auto; /* Allow scroll if necessary */
-  max-height: 500px;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  z-index: 1000;
+  min-width: 100vw;
+  /* min-height: 100vh; */
+}
+
+.close-button-container {
+  position: absolute;
+  top: 0;
+  right: 90px;
+  z-index: 100;
 }
 
 .close-draft-board-button {
   position: absolute;
-  top: 6px;
-  right: 8px;
+  top: 0;
+  right: 0;
   background-color: #ff4d4d;
   color: white;
   border: none;
@@ -43,6 +50,17 @@ code {
 
 .close-draft-board-button:hover {
   background-color: #5e5e5e;
+}
+
+.draft-board-container {
+  width: 85%;
+  margin-top: 8px;
+  background-color: white;
+  z-index: 10;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: auto;
+  max-height: 500px;
 }
 
 .draft-board-table {
@@ -97,17 +115,19 @@ code {
 
 .player-name {
   font-weight: bold;
+  /* font-size: .8em; */
 }
 
 .player-team-position {
-  font-size: .8em;
-  color: #f3f3f3;
+  font-size: .7em;
+  color: #464646;
 }
 
 .draft-cell {
   cursor: pointer;
   text-align: left;
   position: relative;
+  padding: 1rem !important;
 }
 
 .sleeper-form-container {
@@ -152,10 +172,12 @@ code {
 
 .user-roster {
   width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .roster-table {
-  width: 100%;
+  width: 50%;
   border-collapse: collapse;
 }
 
@@ -214,6 +236,18 @@ code {
   font-weight: bold;
 }
 
+.toggle-team-view-button:disabled {
+  background-color: #c3c3c3;
+  color: #979797;
+  cursor: default;
+}
+
+.toggle-team-view-button:disabled:hover {
+  background-color: #c3c3c3;
+  color: #979797;
+  font-weight: normal;
+}
+
 .sleeper-home-button {
     background-color: #f7f1ea;
     margin: 12px;
@@ -225,4 +259,14 @@ code {
 
 .sleeper-home-button:hover {
   background-color: #f7dbbc;
+}
+
+.available-players-container {
+  margin-left: 5rem;
+}
+
+.disabled-message {
+  margin-top: 5px;
+  font-size: 14px;
+  color: red;
 }
