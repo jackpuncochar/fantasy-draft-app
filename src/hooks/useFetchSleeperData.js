@@ -53,3 +53,14 @@ export const fetchDraftPicks = async (draftId) => {
     throw error;
   }
 };
+
+// Fetch auction-specific data
+export const fetchAuctionData = async (draftId) => {
+  try {
+    const response = await axios.get(`https://api.sleeper.app/v1/draft/${draftId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching auction data:', error);
+    throw error;
+  }
+};

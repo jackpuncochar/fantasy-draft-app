@@ -67,7 +67,13 @@ const DraftBoardTable = ({ toggleView }) => {
                     >
                       {draftPick ? (
                         <>
-                          <span className="pick-number">{draftPick.pick_no}</span>
+                          {draftData.type === 'auction' ? (
+                            <div className="bid-amount">
+                              <span className="bid-amount-value">${draftPick.metadata.amount}</span>
+                            </div>
+                          ) : (
+                            <span className="pick-number">{draftPick.pick_no}</span>
+                          )}
                           <div className="player-info">
                             <div className="player-name">
                               {draftPick.metadata.first_name.charAt(0)}. {draftPick.metadata.last_name}

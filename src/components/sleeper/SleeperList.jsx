@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import useStore from '../../store/Store';
 
-const SleeperList = () => {
-    const { playerRanks, draftPicks, selectedLeague } = useStore();
+const SleeperList = ( {currentPlayer, currentBid} ) => {
+    const { playerRanks, draftPicks, selectedLeague, draftType } = useStore();
     const [sortColumn, setSortColumn] = useState('Rank');
     const [sortDirection, setSortDirection] = useState('asc');
     const [positionFilters, setPositionFilters] = useState({}); // Track checkbox states
@@ -25,6 +25,14 @@ const SleeperList = () => {
             setAvailablePlayers(filteredPlayers);
         }
     }, [selectedLeague, playerRanks, draftPicks]);
+
+    const headerOptions = [
+        'Player', 'Team', 'Pos', 'Rank', 'Pos Rank', 'Tier', 'Bye',
+        draftType === 'auction' ? 'Auction Value' : null,
+        draftType === 'snake' ? 'ADP' : null,
+        draftType === 'snake' ? 'Rank Diff' : null,
+        draftType === 'snake' ? 'ADP Diff' : null
+    ].filter(Boolean);
 
     const currentPickNumber = draftPicks ? draftPicks.length + 1 : 1;
 
@@ -49,7 +57,7 @@ const SleeperList = () => {
     const isNumericColumn = (column) => {
         return [
             'Rank', 'Tier', 'Pos Rank', 'Bye', 'ADP', 
-            'Rank Diff', 'ADP Diff', 'Avg Pick', 'High', 'Low', 'Std Dev'
+            'Rank Diff', 'ADP Diff', 'Avg Pick', 'High', 'Low', 'Std Dev', 'Auction Value'
         ].includes(column);
     };
 
@@ -101,11 +109,11 @@ const SleeperList = () => {
 
             // Handle sorting for 'Rank Diff' and 'ADP Diff'
             if (sortColumn === 'Rank Diff') {
-                bValue = currentPickNumber - parseInt(a.Rank);
-                aValue = currentPickNumber - parseInt(b.Rank);
+                bValue = draftType === 'snake' ? currentPickNumber - parseInt(a.Rank) : null;
+                aValue = draftType === 'snake' ? currentPickNumber - parseInt(b.Rank) : null;
             } else if (sortColumn === 'ADP Diff') {
-                bValue = currentPickNumber - parseFloat(a.ADP);
-                aValue = currentPickNumber - parseFloat(b.ADP);
+                bValue = draftType === 'snake' ? currentPickNumber - parseFloat(a.ADP) : null;
+                aValue = draftType === 'snake' ? currentPickNumber - parseFloat(b.ADP) : null;
             } else if (isNumericColumn(sortColumn)) {
                 aValue = parseFloat(aValue);
                 bValue = parseFloat(bValue);
@@ -115,13 +123,12 @@ const SleeperList = () => {
             if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
             return 0;
         });
-    }, [availablePlayers, sortColumn, sortDirection, positionFilters, currentPickNumber]);
+    }, [availablePlayers, sortColumn, sortDirection, positionFilters, currentPickNumber, draftType]);
 
     const uniquePositions = ['All', ...new Set(availablePlayers.map(player => player.Position))];
-
+    
     return (
         <div className="available-players-container">
-            <p>Current Pick: {currentPickNumber}</p>
             <h2 style={{ marginBottom:'.5em' }}>Available Players</h2>
             <div>
             <fieldset style={{ border:'none' }}>
@@ -153,8 +160,8 @@ const SleeperList = () => {
             <table style={{ borderCollapse: 'collapse', width: '60%' }}>
                 <thead>
                     <tr>
-                        {['Player', 'Team', 'Pos', 'Rank', 'Pos Rank', 'Tier', 'Bye', 'ADP', 'Rank Diff', 'ADP Diff'].map(header => (
-                            <th key={header} onClick={() => handleSort(header)} style={{cursor: 'pointer'}}>
+                        {headerOptions.map(header => (
+                            <th key={header} onClick={() => handleSort(header)} style={{ cursor: 'pointer' }}>
                                 {header} {sortColumn === header && (sortDirection === 'asc' ? '↑' : '↓')}
                             </th>
                         ))}
@@ -162,8 +169,8 @@ const SleeperList = () => {
                 </thead>
                 <tbody>
                     {sortedAndFilteredPlayers.map((player, index) => {
-                        const rankDiff = currentPickNumber - parseInt(player.Rank);
-                        const adpDiff = currentPickNumber - parseFloat(player.ADP);
+                        const rankDiff = draftType === 'snake' ? currentPickNumber - parseInt(player.Rank) : null;
+                        const adpDiff = draftType === 'snake' ? currentPickNumber - parseFloat(player.ADP) : null;
                         return (
                             <tr key={index} style={{ borderBottom: '1px solid #ddd' }}>
                                 <td>{player.Player}</td>
@@ -173,9 +180,18 @@ const SleeperList = () => {
                                 <td>{player['Pos Rank']}</td>
                                 <td>{player.Tier}</td>
                                 <td>{player.Bye}</td>
-                                <td>{player.ADP}</td>
-                                <td style={getDifferenceStyle(rankDiff)}>{formatDifference(rankDiff)}</td>
-                                <td style={getDifferenceStyle(adpDiff)}>{formatDifference(adpDiff)}</td>
+                                {draftType === 'auction' && (
+                                    <>
+                                        <td>{player['Adjusted Value']}</td>
+                                    </>
+                                )}
+                                {draftType === 'snake' && (
+                                    <>
+                                        <td>{player.ADP}</td>
+                                        <td style={getDifferenceStyle(rankDiff)}>{formatDifference(rankDiff)}</td>
+                                        <td style={getDifferenceStyle(adpDiff)}>{formatDifference(adpDiff)}</td>
+                                    </>
+                                )}
                             </tr>
                         );
                     })}

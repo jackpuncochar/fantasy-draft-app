@@ -1,20 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import useStore from '../../store/Store';
-import { fetchDraftPicks } from '../../hooks/useFetchSleeperData';
+import { fetchDraftPicks, fetchAuctionData } from '../../hooks/useFetchSleeperData';
 import DraftBoardTable from './DraftBoardTable';
 import SleeperList from './SleeperList';
 import TeamView from './TeamView';
+import ValueDifferenceByPosition from './ValueDifferenceByPosition';
 
 const DraftBoard = () => {
-  const { draftData, setDraftPicks, addDraftPickStat, playerRanks } = useStore();
+  const { draftData, setDraftPicks, setAuctionData, addDraftPickStat, setDraftType, playerRanks } = useStore();
   const [isLiveUpdating, setIsLiveUpdating] = useState(false);
   const [activeView, setActiveView] = useState('board');
+  const [currentPlayer, setCurrentPlayer] = useState(null);
+  const [currentBid, setCurrentBid] = useState(null);
 
   useEffect(() => {
+    // Set draftType in the store
+    setDraftType(draftData.type);
+
     let interval;
     if (isLiveUpdating) {
       interval = setInterval(async () => {
         try {
+
+          if (draftData.type === 'auction') {
+            const auctionInfo = await fetchAuctionData(draftData.draft_id);
+            setAuctionData(auctionInfo);
+            // Assuming auctionData contains a field for the current player and current bid
+            setCurrentPlayer(auctionInfo.metadata.nominated_player_id);
+            setCurrentBid(auctionInfo.metadata.highest_offer);
+          }
+
           const picks = await fetchDraftPicks(draftData.draft_id);
           setDraftPicks(picks);
         
@@ -34,7 +49,7 @@ const DraftBoard = () => {
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [isLiveUpdating, draftData, setDraftPicks, addDraftPickStat, playerRanks]);
+  }, [isLiveUpdating, draftData, setDraftPicks, setAuctionData, addDraftPickStat, playerRanks, setDraftType]);
 
   if (!draftData) {
     return (
@@ -101,7 +116,11 @@ const DraftBoard = () => {
           />
         )}
         {activeView === 'teams' && <TeamView />}
-      <SleeperList />
+      <ValueDifferenceByPosition />
+      <SleeperList 
+        currentPlayer={currentPlayer}
+        currentBid={currentBid}
+      />
     </div>
   );
 };

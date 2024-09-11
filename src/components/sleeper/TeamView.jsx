@@ -10,7 +10,9 @@ const TeamView = () => {
     getDraftPickStats, 
     mainUser,
     getPlayerAdp,
-    getPlayerRank } = useStore();
+    getPlayerRank,
+    getPlayerAuctionValue,
+    draftType } = useStore();
   
   // State to track the selected user's ID
   const [selectedUserId, setSelectedUserId] = useState(null);
@@ -77,6 +79,7 @@ const TeamView = () => {
 
       const adp = pick ? getPlayerAdp(`${pick.metadata.first_name} ${pick.metadata.last_name}`) : '';
       const rank = pick ? getPlayerRank(`${pick.metadata.first_name} ${pick.metadata.last_name}`) : '';
+      const auctionValue = pick ? getPlayerAuctionValue(`${pick.metadata.first_name} ${pick.metadata.last_name}`) : '';
       let stats = { adpDiff: 0, rankDiff: 0 };
 
       if (pick) {
@@ -87,7 +90,21 @@ const TeamView = () => {
         console.log(`Pick ID: ${pick.player_id} - ADP Diff: ${stats.adpDiff}, Rank Diff: ${stats.rankDiff}`);
       }
 
-      return (
+      // Render differently based on draft type
+      return draftType === 'auction' ? (
+        <tr key={index}>
+          <td className="slot-name">{slot}</td>
+          <td className="player-name-full">
+            {pick ? (
+              <>
+                {pick.metadata.first_name} {pick.metadata.last_name} ({pick.metadata.team || 'FA'})
+              </>
+            ) : ''}
+          </td>
+          <td>{pick ? auctionValue : ''}</td>
+          <td>{pick ? pick.metadata.amount : ''}</td>
+        </tr>
+      ) : (
         <tr key={index}>
           <td className="slot-name">{slot}</td>
           <td className="player-name-full">
@@ -113,20 +130,31 @@ const TeamView = () => {
             <tr>
               <th>Position</th>
               <th>Player</th>
-              <th>Pick</th>
-              <th>ADP</th>
-              <th>Rank</th>
-              <th>ADP Diff</th>
-              <th>Rank Diff</th>
+              {draftType === 'auction' ? (
+                <>
+                  <th>Predicted Value</th>
+                  <th>Actual Bid</th>
+                </>
+              ) : (
+                <>
+                  <th>Pick</th>
+                  <th>ADP</th>
+                  <th>Rank</th>
+                  <th>ADP Diff</th>
+                  <th>Rank Diff</th>
+                </>
+              )}
             </tr>
           </thead>
           <tbody>
             {rosterRows}
-            <tr className="totals-row">
-            <td colSpan="5" className="totals-label">Value Totals</td>
-            <td>{totalAdpDiff}</td>
-            <td>{totalRankDiff}</td>
-        </tr>
+            {draftType !== 'auction' && (
+              <tr className="totals-row">
+                <td colSpan="5" className="totals-label">Value Totals</td>
+                <td>{totalAdpDiff}</td>
+                <td>{totalRankDiff}</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </>
@@ -149,9 +177,11 @@ const TeamView = () => {
         ))}
       </div>
       {selectedUserId && (
-        <div className="user-roster">
-          {renderRoster()}
-        </div>
+        <>
+          <div className="user-roster">
+            {renderRoster()}
+          </div>
+        </>
       )}
     </div>
   );

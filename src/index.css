@@ -270,3 +270,18 @@ code {
   font-size: 14px;
   color: red;
 }
+
+.table-center {
+  margin: 0 auto;
+  border-collapse: collapse;
+  width: 30%;
+}
+
+.table-center th,
+.table-center td {
+  text-align: center;
+}
+
+.table-center th {
+  font-weight: bold;
+}
